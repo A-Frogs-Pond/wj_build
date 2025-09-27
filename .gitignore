@@ -1,0 +1,11 @@
+*.zip
+output/
+win/
+linux/
+macos/
+__pycache__/
+.vscode/
+.env
+tmp_scripts/
+steam_scripts/
+venv/

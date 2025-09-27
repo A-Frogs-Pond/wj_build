@@ -1,0 +1,30 @@
+"AppBuild"
+{
+	"AppID" "{{ appid }}" // your AppID
+	"Desc" "Upload Linux" // internal description for this build
+	"verbose" "0" // spew more build details in console
+	"preview" "0" // make this a preview build only, nothing is uploaded
+
+	"ContentRoot" "..\linux\" // root content folder, relative to location of this file
+	"BuildOutput" "..\output\" // build output folder for build logs and build cache files
+
+	"Depots"
+	{
+		"{{ linux_depot_id }}" // LINUX Depot
+		{
+			"FileMapping"
+			{
+				"LocalPath" "*.so" // all files from contentroot folder
+				"DepotPath" "." // mapped into the root of the depot
+				"recursive" "1" // include all subfolders
+			}
+
+			"FileMapping"
+			{
+				"LocalPath" "*.x86_64" // all files from contentroot folder
+				"DepotPath" "." // mapped into the root of the depot
+				"recursive" "1" // include all subfolders
+			}
+		}
+	}
+}
