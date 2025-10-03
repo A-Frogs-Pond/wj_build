@@ -1,4 +1,6 @@
 import os, shutil, subprocess, re, time, jinja2
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -12,6 +14,8 @@ CONTENT_DEPOT_ID = os.environ["CONTENT_DEPOT_ID"]
 WINDOWS_DEPOT_ID = os.environ["WINDOWS_DEPOT_ID"]
 MACOS_DEPOT_ID = os.environ["MACOS_DEPOT_ID"]
 LINUX_DEPOT_ID = os.environ["LINUX_DEPOT_ID"]
+SLACK_TOKEN = os.getenv("SLACK_TOKEN")
+SLACK_CHANNEL_ID = os.getenv("SLACK_CHANNEL_ID")
 
 def clean(path: str):
 	shutil.rmtree(path, ignore_errors=True)
@@ -133,6 +137,20 @@ def package_all(version: str):
 	package("macos", "{}_{}_macos".format(PROJECT_NAME, version))
 	package("linux", "{}_{}_linux".format(PROJECT_NAME, version))
 
+def post_slack_message(message: str):
+	if not SLACK_TOKEN or not SLACK_CHANNEL_ID:
+		return # Don't send a message if there's no Slack config.
+
+	client = WebClient(token=SLACK_TOKEN)
+	try:
+		
+		client.chat_postMessage( # type: ignore
+			channel=SLACK_CHANNEL_ID,
+			markdown_text=message
+		)
+	except SlackApiError as e:
+		print(e)
+
 def main():
 	print("Project path: {}".format(PROJECT_PATH))
 	print()
@@ -156,6 +174,8 @@ def main():
 		upload_all_depots_to_steam()
 	else:
 		upload_content_to_steam()
+
+	post_slack_message(":tada::godot: Created and uploaded version *{}* to Steam.\nMake sure to mark the build as latest in the Steamworks API to make it public.".format(new_version))
 
 if __name__ == "__main__":
 	main()
